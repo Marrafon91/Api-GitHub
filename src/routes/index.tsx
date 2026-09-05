@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "../pages/Home";
+import Repositorio from "../pages/Repositorio";
 
-import Repositorio from "../Repositorio";
-import Home from "../Home";
+
 
 export default function AppRoutes() {
   return (

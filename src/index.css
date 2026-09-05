@@ -3,12 +3,9 @@
 @import "tailwindcss";
 
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
   font-family: "Sen", sans-serif;
 }
 
 body {
-  background: #0d2636;
+  background: #0D2636;
 }
