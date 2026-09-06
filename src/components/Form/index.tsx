@@ -1,5 +1,5 @@
 type FormProps = {
-  onSubmit: () => void;
+  onSubmit: (e: React.SubmitEvent<HTMLFormElement>) => void;
   children: React.ReactNode;
 };
 
