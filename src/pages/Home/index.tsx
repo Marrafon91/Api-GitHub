@@ -24,7 +24,7 @@ export default function Home() {
         name: response.data.full_name,
       };
 
-      setRespositorios((prev) => [...prev, data]);
+      setRespositorios((respositorios) => [...respositorios, data]);
       setNewRepo("");
     } catch (error) {
       setError("Erro na requisição");
