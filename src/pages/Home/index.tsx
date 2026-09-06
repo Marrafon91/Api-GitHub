@@ -1,9 +1,11 @@
 import { useState } from "react";
 import Form from "../../components/Form";
 import SubmitButton from "../../components/SubmitButton";
-import { FaGithub, FaPlus, FaSpinner } from "react-icons/fa";
+import { FaBars, FaGithub, FaPlus, FaSpinner } from "react-icons/fa";
 import api from "../../services/api";
 import type { RepositoriosDTO } from "../../types/repositorio";
+import { Link } from "react-router";
+import axios from "axios";
 
 export default function Home() {
   const [newRepo, setNewRepo] = useState("");
@@ -15,10 +17,18 @@ export default function Home() {
     e.preventDefault();
 
     setError(null);
+
+    const repo = newRepo.trim();
+
+    if (!repo) {
+      setError("Digite o repositório!");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const response = await api.get(`repos/${newRepo}`);
+      const response = await api.get(`/repos/${repo}`);
 
       const data = {
         name: response.data.full_name,
@@ -27,7 +37,15 @@ export default function Home() {
       setRespositorios((respositorios) => [...respositorios, data]);
       setNewRepo("");
     } catch (error) {
-      setError("Erro na requisição");
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 403) {
+          setError(
+            "Limite de requisições da API excedido. Tente novamente mais tarde.",
+          );
+        } else {
+          setError("Repositório não encontrado!");
+        }
+      }
       console.error("ERROR:", error);
     } finally {
       setLoading(false);
@@ -64,11 +82,20 @@ export default function Home() {
 
         {error && <p className="text-red-500">{error}</p>}
 
-        <div className="w-full">
-          {respositorios.map((repositorio) => (
-            <p key={repositorio.name}>{repositorio.name}</p>
+        <ul className="w-full space-y-2">
+          {respositorios.map((repo) => (
+            <li
+              key={repo.name}
+              className="flex items-center justify-between rounded-md border border-gray-200 p-3"
+            >
+              <span>{repo.name}</span>
+
+              <Link to="/repositorio">
+                <FaBars size={20} />
+              </Link>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </main>
   );
