@@ -1,26 +1,36 @@
 import { useState } from "react";
 import Form from "../../components/Form";
 import SubmitButton from "../../components/SubmitButton";
-import { FaGithub, FaPlus } from "react-icons/fa";
+import { FaGithub, FaPlus, FaSpinner } from "react-icons/fa";
 import api from "../../services/api";
 import type { RepositoriosDTO } from "../../types/repositorio";
 
 export default function Home() {
   const [newRepo, setNewRepo] = useState("");
   const [respositorios, setRespositorios] = useState<RepositoriosDTO[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    setError(null);
+    setLoading(true);
+
     try {
       const response = await api.get(`repos/${newRepo}`);
+
       const data = {
         name: response.data.full_name,
       };
 
-      setRespositorios([...respositorios, data]);
+      setRespositorios((prev) => [...prev, data]);
       setNewRepo("");
     } catch (error) {
-      console.error("ERROR ", error);
+      setError("Erro na requisição");
+      console.error("ERROR:", error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -37,14 +47,28 @@ export default function Home() {
             type="text"
             placeholder="Adicionar Repositório"
             value={newRepo}
-            onChange={(e) => {
-              setNewRepo(e.target.value);
-            }}
+            onChange={(e) => setNewRepo(e.target.value)}
             className="min-w-0 flex-1 rounded-md border border-gray-300 bg-white px-2 py-2 font-bold text-gray-500 outline-0"
           />
 
-          <SubmitButton children={<FaPlus size={17} />}></SubmitButton>
+          <SubmitButton loading={loading}>
+            {loading ? (
+              <FaSpinner className="animate-spin" size={17} />
+            ) : (
+              <FaPlus size={17} />
+            )}
+          </SubmitButton>
         </Form>
+
+        {loading && <p>Carregando...</p>}
+
+        {error && <p className="text-red-500">{error}</p>}
+
+        <div className="w-full">
+          {respositorios.map((repositorio) => (
+            <p key={repositorio.name}>{repositorio.name}</p>
+          ))}
+        </div>
       </div>
     </main>
   );
