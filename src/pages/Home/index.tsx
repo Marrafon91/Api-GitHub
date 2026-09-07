@@ -1,11 +1,12 @@
-import { useState } from "react";
-import Form from "../../components/Form";
-import SubmitButton from "../../components/SubmitButton";
+import { useCallback, useState } from "react";
 import { FaBars, FaGithub, FaPlus, FaSpinner } from "react-icons/fa";
+import type { RepositoriosDTO } from "../../types/Repositorio";
+
+import SubmitButton from "../../components/SubmitButton";
+import Form from "../../components/Form";
 import api from "../../services/api";
-import type { RepositoriosDTO } from "../../types/repositorio";
-import { Link } from "react-router";
 import axios from "axios";
+import DeleteButton from "../../components/DeleteButton";
 
 export default function Home() {
   const [newRepo, setNewRepo] = useState("");
@@ -52,6 +53,10 @@ export default function Home() {
     }
   }
 
+  const handleDelete = useCallback((repoName: string) => {
+    setRespositorios((prev) => prev.filter((repo) => repo.name !== repoName));
+  }, []);
+
   return (
     <main className="flex min-h-screen items-center justify-center p-4">
       <div className="flex w-full max-w-2xl flex-col items-center justify-center rounded-sm bg-white p-8 shadow-[0_0_20px_black]">
@@ -86,13 +91,19 @@ export default function Home() {
           {respositorios.map((repo) => (
             <li
               key={repo.name}
-              className="flex items-center justify-between rounded-md border border-gray-200 p-3"
+              className="flex list-none items-center justify-between rounded-md border border-gray-200 p-3"
             >
-              <span>{repo.name}</span>
-
-              <Link to="/repositorio">
+              <span>
+                <DeleteButton
+                  onClick={() => {
+                    handleDelete(repo.name);
+                  }}
+                />
+                {repo.name}
+              </span>
+              <a href="" className="text-[#0D2636] no-underline">
                 <FaBars size={20} />
-              </Link>
+              </a>
             </li>
           ))}
         </ul>
