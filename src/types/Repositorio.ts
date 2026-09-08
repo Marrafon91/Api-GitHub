@@ -17,8 +17,19 @@ export type RepositorioFullDTO = {
   forks_count: number;
 };
 
+export type LabelDTO = {
+  id: number;
+  name: string;
+  color?: string;
+};
+
 export type IssueDTO = {
   id: number;
   title: string;
+  user: {
+    login: string;
+    avatar_url: string;
+  };
   html_url: string;
+  labels: LabelDTO[];
 };
