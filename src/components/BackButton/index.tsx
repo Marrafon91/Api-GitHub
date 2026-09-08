@@ -8,7 +8,7 @@ export default function BackButton({ ...props }: BackButtonProps) {
     <button
       {...props}
       type="button"
-      className="mx-2 flex cursor-pointer rounded-md bg-transparent text-black"
+      className="mx-2 flex cursor-pointer rounded-md bg-transparent text-black disabled:cursor-not-allowed disabled:opacity-50"
     >
       <FaArrowLeft size={32} />
     </button>

@@ -4,12 +4,14 @@ import api from "../../services/api";
 import type { IssueDTO, RepositorioFullDTO } from "../../types/Repositorio";
 import { FaSpinner } from "react-icons/fa";
 import BackButton from "../../components/BackButton";
+import FowardButton from "../../components/FowardButton";
 
 export default function Repositorio() {
   const [repo, setRepo] = useState<RepositorioFullDTO | null>(null);
   const [issues, setIssues] = useState<IssueDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
 
   const { repositorio } = useParams();
   const nomeRepo = repositorio ? decodeURIComponent(repositorio) : "";
@@ -25,7 +27,7 @@ export default function Repositorio() {
           api.get(`/repos/${nomeRepo}/issues`, {
             params: {
               state: "open",
-              per_page: 10,
+              per_page: 5,
             },
           }),
         ]);
@@ -48,6 +50,27 @@ export default function Repositorio() {
       setError("Repositório inválido.");
     }
   }, [nomeRepo]);
+
+  useEffect(() => {
+    async function loadIssue() {
+      const nomeRepo = repositorio ? decodeURIComponent(repositorio) : "";
+
+      const response = await api.get(`/repos/${nomeRepo}/issues`, {
+        params: {
+          state: "open",
+          page,
+          per_page: 5,
+        },
+      });
+      setIssues(response.data);
+    }
+
+    loadIssue();
+  }, [repositorio, page]);
+
+  function handlePage(action: string) {
+    setPage(action === "back" ? page - 1 : page + 1);
+  }
 
   if (loading) {
     return (
@@ -84,7 +107,7 @@ export default function Repositorio() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center p-4">
-      <header className="relative flex w-full max-w-2xl flex-col items-center justify-center rounded-lg bg-white shadow-[0_0_20px_black]">
+      <div className="relative flex w-full max-w-2xl flex-col items-center justify-center rounded-lg bg-white shadow-[0_0_20px_black]">
         <Link to="/" className="absolute top-4 left-4">
           <BackButton />
         </Link>
@@ -133,7 +156,14 @@ export default function Repositorio() {
             </li>
           ))}
         </ul>
-      </header>
+        <div className="flex w-full items-center justify-between gap-4 p-4">
+          <BackButton
+            onClick={() => handlePage("back")}
+            disabled={page < 2}
+          />
+          <FowardButton onClick={() => handlePage("next")} />
+        </div>
+      </div>
     </main>
   );
 }
