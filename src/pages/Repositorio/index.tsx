@@ -137,10 +137,7 @@ export default function Repositorio() {
 
         <ul className="mt-8 flex flex-col items-start border-t border-black p-8 text-black">
           {issues.map((issue) => (
-            <li
-              key={String(issue.id)}
-              className="flex w-full items-center p-2"
-            >
+            <li key={String(issue.id)} className="flex w-full items-center p-2">
               <img
                 src={issue.user.avatar_url}
                 alt={issue.user.login}
