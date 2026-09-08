@@ -33,3 +33,14 @@ export type IssueDTO = {
   html_url: string;
   labels: LabelDTO[];
 };
+
+export type Filter = {
+  label: string;
+  value: string;
+};
+
+export type StateFiltersProps = {
+  filters: Filter[];
+  activeFilter: number;
+  setActiveFilter: (index: number) => void;
+};
