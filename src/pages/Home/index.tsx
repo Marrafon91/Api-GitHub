@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { FaBars, FaGithub, FaPlus, FaSpinner } from "react-icons/fa";
 import type { RepositoriosDTO } from "../../types/Repositorio";
 
@@ -10,9 +10,22 @@ import DeleteButton from "../../components/DeleteButton";
 
 export default function Home() {
   const [newRepo, setNewRepo] = useState("");
-  const [respositorios, setRespositorios] = useState<RepositoriosDTO[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [respositorios, setRespositorios] = useState<RepositoriosDTO[]>(() => {
+    const repoStorage = localStorage.getItem("repos");
+
+    if (repoStorage) {
+      return JSON.parse(repoStorage);
+    }
+
+    return [];
+  });
+
+  useEffect(() => {
+    localStorage.setItem("repos", JSON.stringify(respositorios));
+  }, [respositorios]);
 
   async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -31,11 +44,23 @@ export default function Home() {
     try {
       const response = await api.get(`/repos/${repo}`);
 
-      const data = {
-        name: response.data.full_name,
+      const repoName = response.data.full_name;
+
+      const hasRepo = respositorios.some(
+        (repositorio) =>
+          repositorio.name.toLowerCase() === repoName.toLowerCase(),
+      );
+
+      if (hasRepo) {
+        setError("Repositório já existe!");
+        return;
+      }
+
+      const data: RepositoriosDTO = {
+        name: repoName,
       };
 
-      setRespositorios((respositorios) => [...respositorios, data]);
+      setRespositorios((prev) => [...prev, data]);
       setNewRepo("");
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -43,10 +68,13 @@ export default function Home() {
           setError(
             "Limite de requisições da API excedido. Tente novamente mais tarde.",
           );
-        } else {
+        } else if (error.response?.status === 404) {
           setError("Repositório não encontrado!");
+        } else {
+          setError("Erro ao buscar repositório.");
         }
       }
+
       console.error("ERROR:", error);
     } finally {
       setLoading(false);

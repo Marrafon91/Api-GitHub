@@ -3,7 +3,7 @@ import type React from "react";
 type SubmitButtonProps = {
   children?: React.ReactNode;
   loading?: boolean;
-};
+} & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 export default function SubmitButton({ children, loading }: SubmitButtonProps) {
   return (
