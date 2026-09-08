@@ -7,6 +7,7 @@ import Form from "../../components/Form";
 import api from "../../services/api";
 import axios from "axios";
 import DeleteButton from "../../components/DeleteButton";
+import { Link } from "react-router-dom";
 
 export default function Home() {
   const [newRepo, setNewRepo] = useState("");
@@ -129,9 +130,12 @@ export default function Home() {
                 />
                 {repo.name}
               </span>
-              <a href="" className="text-[#0D2636] no-underline">
+              <Link
+                to={`/repositorio/${encodeURIComponent(repo.name)}`}
+                className="text-[#0D2636] no-underline"
+              >
                 <FaBars size={20} />
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
