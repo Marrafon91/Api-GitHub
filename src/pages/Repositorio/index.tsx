@@ -1,16 +1,18 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import api from "../../services/api";
-import type { IssueDTO, RepositorioIssuesDTO } from "../../types/Repositorio";
+import type { IssueDTO, RepositorioFullDTO } from "../../types/Repositorio";
+import { FaSpinner } from "react-icons/fa";
+import BackButton from "../../components/BackButton";
 
 export default function Repositorio() {
-  const { repositorio } = useParams();
-
-  const nomeRepo = repositorio ? decodeURIComponent(repositorio) : "";
-  const [repo, setRepo] = useState<RepositorioIssuesDTO | null>(null);
+  const [repo, setRepo] = useState<RepositorioFullDTO | null>(null);
   const [issues, setIssues] = useState<IssueDTO[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const { repositorio } = useParams();
+  const nomeRepo = repositorio ? decodeURIComponent(repositorio) : "";
 
   useEffect(() => {
     async function load() {
@@ -50,7 +52,14 @@ export default function Repositorio() {
   if (loading) {
     return (
       <main className="flex min-h-screen items-center justify-center">
-        <p className="text-lg font-bold">Carregando...</p>
+        <p className="flex items-center gap-2 text-lg font-bold text-white">
+          {loading && (
+            <>
+              <FaSpinner className="animate-spin" size={17} />
+              Carregando...
+            </>
+          )}
+        </p>
       </main>
     );
   }
@@ -75,11 +84,22 @@ export default function Repositorio() {
 
   return (
     <main className="flex min-h-screen items-center justify-center p-4">
-      <div className="flex w-full max-w-2xl flex-col items-center justify-center rounded-sm bg-white p-8 shadow-[0_0_20px_black]">
-        <h1 className="flex h-screen items-center justify-center text-3xl font-bold text-red-500">
-          {nomeRepo}
+      <header className="relative flex w-full max-w-2xl flex-col items-center justify-center rounded-lg bg-white shadow-[0_0_20px_black]">
+        <Link to="/" className="absolute top-4 left-4">
+          <BackButton />
+        </Link>
+        <img
+          src={repo.owner.avatar_url}
+          alt={repo.owner.login}
+          className="my-5.5 w-37.5 rounded-[20%]"
+        />
+        <h1 className="flex items-center justify-center text-4xl font-bold text-[#0D2636]">
+          {repo.name.toLocaleUpperCase()}
         </h1>
-      </div>
+        <p className="my-1.5 w-full max-w-100 text-center text-sm leading-[1.4] wrap-break-word text-black">
+          {repo.description}
+        </p>
+      </header>
     </main>
   );
 }
